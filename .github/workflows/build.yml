@@ -21,9 +21,13 @@ jobs:
       - name: Set up build environment
         run: |
           # Zainstaluj wymagane narzędzia (np. CMake, Visual Studio)
-          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-          choco install visualstudio2022community --package-parameters "--add Microsoft.VisualStudio.Workload.NativeDesktop"
-          refreshenv
+          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+          choco install visualstudio2022community --package-parameters "--add Microsoft.VisualStudio.Workload.NativeDesktop" -y
+
+          # Dodaj narzędzia Visual Studio do ścieżki systemowej
+          echo "Adding Visual Studio tools to PATH..."
+          $vsPath = "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin"
+          echo "##vso[task.prependpath]$vsPath"
 
       # Krok 3: Zbuduj projekt
       - name: Build project
