@@ -15,7 +15,7 @@ jobs:
     steps:
       # Krok 1: Pobierz repozytorium
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Krok 2: Skonfiguruj środowisko budowania (np. CMake, MSBuild)
       - name: Set up build environment
