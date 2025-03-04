@@ -17,47 +17,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Krok 2: Skonfiguruj środowisko budowania (MSBuild, CMake)
-      - name: Set up build environment
-        run: |
-          # Pobierz i zainstaluj Visual Studio Build Tools
-          $vsBuildToolsUrl = "https://aka.ms/vs/17/release/vs_BuildTools.exe"
-          $vsBuildToolsPath = "$env:RUNNER_TEMP\vs_BuildTools.exe"
-          Invoke-WebRequest -Uri $vsBuildToolsUrl -OutFile $vsBuildToolsPath
+      # Krok 2: Skonfiguruj MSBuild
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.0.2
 
-          # Uruchom instalator z wymaganymi komponentami
-          Start-Process -FilePath $vsBuildToolsPath -ArgumentList '--quiet --wait --norestart --add Microsoft.VisualStudio.Workload.MSBuildTools --add Microsoft.VisualStudio.Workload.VCTools' -NoNewWindow -Wait
+      # Krok 3: Zainstaluj CMake
+      - name: Install CMake
+        run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
 
-          # Sprawdź, czy MSBuild jest dostępny
-          $msbuildPath = "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
-          if (Test-Path $msbuildPath) {
-              echo "MSBuild is installed at $msbuildPath"
-          } else {
-              echo "MSBuild is not installed!"
-              exit 1
-          }
-
-          # Dodaj narzędzia MSBuild do ścieżki systemowej
-          $vsPath = "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin"
-          echo "Adding MSBuild to PATH: $vsPath"
-          echo "$vsPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-          # Zainstaluj CMake
-          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
-
-      # Krok 3: Zbuduj projekt
+      # Krok 4: Zbuduj projekt
       - name: Build project
         run: |
           # Przejdź do katalogu z projektem
-          cd vc14  # Zmień na odpowiedni katalog
+          cd vc14  # Zmień na odpowiedni katalog, jeśli jest inny
           # Uruchom CMake, wskazując katalog główny jako źródło
           cmake -G "Visual Studio 17 2022" -A x64 ../..
-          # Uruchom MSBuild z pełną ścieżką (użyj poprawnej składni PowerShell)
-          & "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" "otclient.sln" /p:Configuration=Release
+          # Uruchom MSBuild
+          msbuild.exe "otclient.sln" /p:Configuration=Release
 
-      # Krok 4: Przesuń plik wykonywalny do artefaktów
+      # Krok 5: Przesuń plik wykonywalny do artefaktów
       - name: Upload executable as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SilverMoon2.exe
-          path: vc14/Release/SilverMoon2.exe  # Zmień na ścieżkę do swojego pliku .exe
+          name: SilverMoon.exe
+          path: vc14/Release/SilverMoon.exe  # Zmień na ścieżkę do swojego pliku .exe
