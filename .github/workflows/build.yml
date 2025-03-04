@@ -17,25 +17,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Krok 2: Skonfiguruj środowisko budowania (np. CMake, Visual Studio)
+      # Krok 2: Skonfiguruj środowisko budowania (MSBuild, CMake)
       - name: Set up build environment
         run: |
-          # Zainstaluj wymagane narzędzia (np. CMake, Visual Studio)
-          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
-          choco install visualstudio2022community --package-parameters "--add Microsoft.VisualStudio.Workload.NativeDesktop" -y
+          # Pobierz i zainstaluj Visual Studio Build Tools
+          $vsBuildToolsUrl = "https://aka.ms/vs/17/release/vs_BuildTools.exe"
+          $vsBuildToolsPath = "$env:RUNNER_TEMP\vs_BuildTools.exe"
+          Invoke-WebRequest -Uri $vsBuildToolsUrl -OutFile $vsBuildToolsPath
 
-          # Sprawdź, czy MSBuild jest dostępny
-          $msbuildPath = "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
-          if (Test-Path $msbuildPath) {
-              echo "MSBuild is installed at $msbuildPath"
-          } else {
-              echo "MSBuild is not installed!"
-              exit 1
-          }
+          # Uruchom instalator z wymaganymi komponentami
+          Start-Process -FilePath $vsBuildToolsPath -ArgumentList '--quiet --wait --norestart --add Microsoft.VisualStudio.Workload.MSBuildTools --add Microsoft.VisualStudio.Workload.VCTools' -NoNewWindow -Wait
 
           # Dodaj narzędzia MSBuild do ścieżki systemowej
-          $vsPath = "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin"
+          $vsPath = "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin"
           echo "##vso[task.prependpath]$vsPath"
+
+          # Zainstaluj CMake
+          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
 
       # Krok 3: Zbuduj projekt
       - name: Build project
@@ -44,8 +42,8 @@ jobs:
           cd src/client
           # Uruchom CMake
           cmake -G "Visual Studio 17 2022" -A x64 .
-          # Uruchom MSBuild z pełną ścieżką
-          "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" otclient.sln /p:Configuration=Release
+          # Uruchom MSBuild
+          msbuild otclient.sln /p:Configuration=Release
 
       # Krok 4: Przesuń plik wykonywalny do artefaktów
       - name: Upload executable as artifact
