@@ -22,14 +22,15 @@ jobs:
       - name: Install CMake
         run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
 
-      - name: Build Boost
-        id: boost
-        uses: egor-tensin/build-boost@v1
-        with:
-          version: '1.71.0'  # Specify the Boost version you need
-          libraries: 'filesystem program_options system'  # List the Boost libraries your project requires
-          platform: 'x64'
-          configuration: 'Release'
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+
+      - name: Install dependencies with vcpkg
+        run: |
+          .\vcpkg\vcpkg.exe install boost-system:x64-windows boost-filesystem:x64-windows
+          .\vcpkg\vcpkg.exe integrate install
 
       - name: Update Windows SDK version
         run: |
@@ -39,7 +40,7 @@ jobs:
       - name: Build project
         run: |
           cd vc14
-          cmake -G "Visual Studio 16 2019" -A x64 ..
+          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_TOOLCHAIN_FILE=..\vcpkg\scripts\buildsystems\vcpkg.cmake ..
           msbuild otclient.sln /p:Configuration=Release
 
       - name: Upload executable as artifact
