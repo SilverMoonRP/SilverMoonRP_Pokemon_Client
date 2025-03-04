@@ -21,11 +21,17 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.0.2
 
-      # Krok 3: Zainstaluj CMake
+      # Krok 3: Zainstaluj wymaganą wersję Windows 10 SDK
+      - name: Install Windows 10 SDK
+        uses: GuillaumeFalourd/setup-windows10-sdk-action@v2.4
+        with:
+          sdk-version: 17134  # Wersja SDK 10.0.17134.0
+
+      # Krok 4: Zainstaluj CMake
       - name: Install CMake
         run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
 
-      # Krok 4: Zbuduj projekt
+      # Krok 5: Zbuduj projekt
       - name: Build project
         run: |
           # Przejdź do katalogu z projektem
@@ -35,7 +41,7 @@ jobs:
           # Uruchom MSBuild
           msbuild.exe "otclient.sln" /p:Configuration=Release
 
-      # Krok 5: Przesuń plik wykonywalny do artefaktów
+      # Krok 6: Przesuń plik wykonywalny do artefaktów
       - name: Upload executable as artifact
         uses: actions/upload-artifact@v4
         with:
