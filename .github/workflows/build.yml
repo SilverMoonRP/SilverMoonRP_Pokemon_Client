@@ -43,8 +43,8 @@ jobs:
           cd vc14  # Zmień na odpowiedni katalog
           # Uruchom CMake (jeśli potrzebne)
           cmake -G "Visual Studio 17 2022" -A x64 .
-          # Uruchom MSBuild z pełną ścieżką
-          "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" otclient.sln /p:Configuration=Release
+          # Uruchom MSBuild z pełną ścieżką (użyj poprawnej składni PowerShell)
+          & "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" "otclient.sln" /p:Configuration=Release
 
       # Krok 4: Przesuń plik wykonywalny do artefaktów
       - name: Upload executable as artifact
