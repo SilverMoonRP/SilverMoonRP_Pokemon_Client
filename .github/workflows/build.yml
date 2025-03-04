@@ -30,7 +30,8 @@ jobs:
 
           # Dodaj narzędzia MSBuild do ścieżki systemowej
           $vsPath = "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin"
-          echo "##vso[task.prependpath]$vsPath"
+          echo "Adding MSBuild to PATH: $vsPath"
+          echo "$vsPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
           # Zainstaluj CMake
           choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
@@ -39,15 +40,15 @@ jobs:
       - name: Build project
         run: |
           # Przejdź do katalogu z projektem
-          cd src/client
-          # Uruchom CMake
+          cd vc14  # Zmień na odpowiedni katalog
+          # Uruchom CMake (jeśli potrzebne)
           cmake -G "Visual Studio 17 2022" -A x64 .
-          # Uruchom MSBuild
-          msbuild otclient.sln /p:Configuration=Release
+          # Uruchom MSBuild z pełną ścieżką
+          "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" otclient.sln /p:Configuration=Release
 
       # Krok 4: Przesuń plik wykonywalny do artefaktów
       - name: Upload executable as artifact
         uses: actions/upload-artifact@v4
         with:
           name: SilverMoon.exe
-          path: src/client/Release/SilverMoon.exe  # Zmień na ścieżkę do swojego pliku .exe
+          path: vc14/Release/SilverMoon.exe  # Zmień na ścieżkę do swojego pliku .exe
