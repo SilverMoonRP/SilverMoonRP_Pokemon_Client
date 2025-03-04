@@ -3,47 +3,46 @@ name: Build Tibia OTS Client
 on:
   push:
     branches:
-      - main  # Uruchom workflow po pushu na gałąź main
+      - main
   pull_request:
     branches:
-      - main  # Uruchom workflow po PR do gałęzi main
+      - main
 
 jobs:
   build:
-    runs-on: windows-latest  # Użyj systemu Windows do budowania
+    runs-on: windows-latest
 
     steps:
-      # Krok 1: Pobierz repozytorium
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Krok 2: Skonfiguruj MSBuild
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
-      # Krok 3: Zainstaluj CMake
       - name: Install CMake
         run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
 
-      # Krok 4: Zaktualizuj wersję Windows SDK w pliku projektu
+      # Krok 3.1: Zainstaluj Boost
+      - name: Install Boost
+        run: choco install boost-msvc-14.2 -y
+
+      # Krok 3.2: Ustaw zmienną BOOST_ROOT
+      - name: Set BOOST_ROOT
+        run: echo "BOOST_ROOT=C:\ProgramData\chocolatey\lib\boost-msvc-14.2" >> $GITHUB_ENV
+
       - name: Update Windows SDK version
         run: |
           $projectFile = 'vc14\otclient.vcxproj'
           (Get-Content $projectFile) -replace '<WindowsTargetPlatformVersion>.*</WindowsTargetPlatformVersion>', '<WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>' | Set-Content $projectFile
 
-      # Krok 5: Zbuduj projekt
       - name: Build project
         run: |
-          # Przejdź do katalogu z projektem
           cd vc14
-          # Uruchom CMake, wskazując katalog główny jako źródło
           cmake -G "Visual Studio 16 2019" -A x64 ..
-          # Uruchom MSBuild
           msbuild otclient.sln /p:Configuration=Release
 
-      # Krok 6: Przesuń plik wykonywalny do artefaktów
       - name: Upload executable as artifact
         uses: actions/upload-artifact@v4
         with:
           name: SilverMoon.exe
-          path: vc14/Release/SilverMoon.exe  # Zmień na ścieżkę do swojego pliku .exe
+          path: vc14/Release/SilverMoon.exe
