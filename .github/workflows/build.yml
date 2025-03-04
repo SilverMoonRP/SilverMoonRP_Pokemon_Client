@@ -19,9 +19,10 @@ jobs:
 
       # Krok 2: Skonfiguruj MSBuild
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.0.2
+        uses: microsoft/setup-msbuild@v1
 
       # Krok 3: Zainstaluj CMake
+      - name: Install CMake
         run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
 
       # Krok 4: Zaktualizuj wersję Windows SDK w pliku projektu
