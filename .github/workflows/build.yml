@@ -1,4 +1,4 @@
-name: SilverMoonRP_Client
+name: Build Tibia OTS Client
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Krok 2: Skonfiguruj środowisko budowania (np. CMake, MSBuild)
+      # Krok 2: Skonfiguruj środowisko budowania (np. CMake, Visual Studio)
       - name: Set up build environment
         run: |
           # Zainstaluj wymagane narzędzia (np. CMake, Visual Studio)
@@ -33,8 +33,8 @@ jobs:
         run: |
           # Przejdź do katalogu z projektem
           cd vc14  # Zmień na odpowiedni katalog
-          # Uruchom CMake
-          cmake -G "Visual Studio 17 2022" -A x64 .
+          # Uruchom CMake, wskazując katalog główny jako źródło
+          cmake -G "Visual Studio 17 2022" -A x64 ../..
           # Uruchom MSBuild
           msbuild ALL_BUILD.vcxproj /p:Configuration=Release
 
