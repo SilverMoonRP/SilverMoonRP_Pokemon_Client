@@ -15,9 +15,10 @@ include(src/client/CMakeLists.txt)
 # Integracja Boost
 find_package(Boost 1.68 REQUIRED COMPONENTS system filesystem)
 if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 else()
-  message(FATAL_ERROR "Boost not found!")
+    message(FATAL_ERROR "Nie można znaleźć biblioteki Boost.")
 endif()
 
 # functions map for reading backtraces

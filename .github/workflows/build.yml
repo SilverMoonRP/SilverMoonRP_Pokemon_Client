@@ -26,7 +26,7 @@ jobs:
         run: choco install boost-msvc-14.2 -y
 
       - name: Set BOOST_ROOT
-        run: echo "BOOST_ROOT=C:\local\boost_1_72_0" >> $GITHUB_ENV
+        run: echo "BOOST_ROOT=C:\Program Files\boost\boost_1_76_0" >> $GITHUB_ENV
 
       - name: Update Windows SDK version
         run: |
