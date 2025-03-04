@@ -22,13 +22,11 @@ jobs:
       - name: Install CMake
         run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
 
-      # Krok 3.1: Zainstaluj Boost
       - name: Install Boost
         run: choco install boost-msvc-14.2 -y
 
-      # Krok 3.2: Ustaw zmienną BOOST_ROOT
       - name: Set BOOST_ROOT
-        run: echo "BOOST_ROOT=C:\ProgramData\chocolatey\lib\boost-msvc-14.2" >> $GITHUB_ENV
+        run: echo "BOOST_ROOT=C:\local\boost_1_72_0" >> $GITHUB_ENV
 
       - name: Update Windows SDK version
         run: |

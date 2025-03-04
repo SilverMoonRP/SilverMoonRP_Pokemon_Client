@@ -12,6 +12,14 @@ option(FRAMEWORK_SQL "Use SQL" OFF)
 include(src/framework/CMakeLists.txt)
 include(src/client/CMakeLists.txt)
 
+# Integracja Boost
+find_package(Boost 1.68 REQUIRED COMPONENTS system filesystem)
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+else()
+  message(FATAL_ERROR "Boost not found!")
+endif()
+
 # functions map for reading backtraces
 if(NOT APPLE)
     set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -Wl,-Map=${PROJECT_NAME}.map")
@@ -52,7 +60,7 @@ add_executable(${PROJECT_NAME} ${framework_SOURCES} ${client_SOURCES} ${executab
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 14)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD_REQUIRED ON)
 
-target_link_libraries(${PROJECT_NAME} ${framework_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${framework_LIBRARIES} ${Boost_LIBRARIES})
 
 if(APPLE AND USE_STATIC_LIBS)
     target_link_libraries(${PROJECT_NAME} "-framework Foundation" "-framework IOKit")
@@ -69,9 +77,9 @@ endif()
 # installation
 set(DATA_INSTALL_DIR share/${PROJECT_NAME})
 install(TARGETS ${PROJECT_NAME}
-		RUNTIME DESTINATION bin
-		LIBRARY DESTINATION lib
-		ARCHIVE DESTINATION lib)
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
 install(FILES README.md BUGS LICENSE AUTHORS init.lua ${PROJECT_NAME}rc.lua DESTINATION ${DATA_INSTALL_DIR})
 install(DIRECTORY data modules DESTINATION ${DATA_INSTALL_DIR} PATTERN ".git" EXCLUDE)
 
