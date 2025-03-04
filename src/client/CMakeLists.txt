@@ -1,19 +1,25 @@
-# CMAKE_CURRENT_LIST_DIR cmake 2.6 compatibility
-if(${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 6)
-    get_filename_component(CMAKE_CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
-endif(${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 6)
+# Minimalna wymagana wersja CMake
+cmake_minimum_required(VERSION 3.10)
 
-# client options
-add_definitions(-DCLIENT)
+# Nazwa projektu
+project(Tibia_OTS_Client)
+
+# Opcje projektu
 option(BOT_PROTECTION "Enable bot protection" ON)
+
+# Definicje dla klienta
+add_definitions(-DCLIENT)
+
+# Komunikat o włączeniu/wyłączeniu ochrony przed botami
 if(BOT_PROTECTION)
     add_definitions(-DBOT_PROTECTION)
     message(STATUS "Bot protection: ON")
-else(BOT_PROTECTION)
+else()
     message(STATUS "Bot protection: OFF")
-endif(BOT_PROTECTION)
+endif()
 
-set(client_SOURCES ${client_SOURCES}
+# Lista plików źródłowych
+set(client_SOURCES
     # client
     ${CMAKE_CURRENT_LIST_DIR}/const.h
     ${CMAKE_CURRENT_LIST_DIR}/global.h
@@ -109,5 +115,12 @@ set(client_SOURCES ${client_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/position.h
 )
 
+# Ustawienia dla plików źródłowych
 set_source_files_properties(${CMAKE_CURRENT_LIST_DIR}/luafunctions.cpp
-                            PROPERTIES LANGUAGE CXX COMPILE_FLAGS "-g0 -Os")
+                            PROPERTIES COMPILE_FLAGS "-g0 -Os")
+
+# Dodaj cel (target) - plik wykonywalny
+add_executable(Tibia_OTS_Client ${client_SOURCES})
+
+# Linkowanie bibliotek (jeśli są wymagane)
+# target_link_libraries(Tibia_OTS_Client PRIVATE <biblioteka1> <biblioteka2>)
