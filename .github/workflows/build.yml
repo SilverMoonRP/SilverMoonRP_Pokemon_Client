@@ -33,8 +33,8 @@ jobs:
         run: |
           # Przejdź do katalogu z projektem
           cd vc14  # Zmień na odpowiedni katalog
-          # Uruchom CMake, wskazując katalog główny jako źródło
-          cmake -G "Visual Studio 17 2022" -A x64 ../..
+          # Uruchom CMake w bieżącym katalogu
+          cmake -G "Visual Studio 17 2022" -A x64 .
           # Uruchom MSBuild
           msbuild ALL_BUILD.vcxproj /p:Configuration=Release
 
