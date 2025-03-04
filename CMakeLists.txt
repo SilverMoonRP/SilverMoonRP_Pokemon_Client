@@ -9,17 +9,20 @@ option(FRAMEWORK_XML "Use XML " ON)
 option(FRAMEWORK_NET "Use NET " ON)
 option(FRAMEWORK_SQL "Use SQL" OFF)
 
+# Znajdź pakiet Boost
+find_package(Boost 1.76 REQUIRED COMPONENTS system filesystem)  # Dodaj wymagane komponenty
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    add_definitions(-DBOOST_ALL_NO_LIB)  # Wyłącz autolinkowanie
+else()
+    message(FATAL_ERROR "Nie znaleziono bibliotek Boost!")
+endif()
+
 include(src/framework/CMakeLists.txt)
 include(src/client/CMakeLists.txt)
 
-# Integracja Boost
-find_package(Boost 1.68 REQUIRED COMPONENTS system filesystem)
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
-else()
-    message(FATAL_ERROR "Nie można znaleźć biblioteki Boost.")
-endif()
+
 
 # functions map for reading backtraces
 if(NOT APPLE)

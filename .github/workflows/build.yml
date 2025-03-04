@@ -16,31 +16,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1
+      - name: Install Boost
+        uses: egor-tensin/build-boost-action@v2
+        with:
+          version: '1.76.0'  # Wersja Boost do zainstalowania
 
       - name: Install CMake
         run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
 
-      - name: Install Boost
-        run: choco install boost-msvc-14.2 -y
-
-      - name: Set BOOST_ROOT
-        run: echo "BOOST_ROOT=C:\Program Files\boost\boost_1_76_0" >> $GITHUB_ENV
-
-      - name: Update Windows SDK version
+      - name: Configure and Build
         run: |
-          $projectFile = 'vc14\otclient.vcxproj'
-          (Get-Content $projectFile) -replace '<WindowsTargetPlatformVersion>.*</WindowsTargetPlatformVersion>', '<WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>' | Set-Content $projectFile
-
-      - name: Build project
-        run: |
-          cd vc14
-          cmake -G "Visual Studio 16 2019" -A x64 ..
-          msbuild otclient.sln /p:Configuration=Release
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config Release
 
       - name: Upload executable as artifact
         uses: actions/upload-artifact@v4
         with:
           name: SilverMoon.exe
-          path: vc14/Release/SilverMoon.exe
+          path: build/Release/SilverMoon.exe  # Upewnij się, że ścieżka jest poprawna
