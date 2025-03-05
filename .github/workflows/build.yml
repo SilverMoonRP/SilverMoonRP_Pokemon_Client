@@ -1,13 +1,3 @@
-name: Build Tibia OTS Client
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
 jobs:
   build:
     runs-on: windows-2022
@@ -20,10 +10,7 @@ jobs:
         uses: MarkusJx/install-boost@v2
         id: install-boost
         with:
-          boost_version: '1.76.0'  # Updated to at least 1.76.0
-
-      - name: Print BOOST_ROOT
-        run: echo "BOOST_ROOT is set to ${{ steps.install-boost.outputs.BOOST_ROOT }}"
+          boost_version: '1.76.0'  # Ensure this matches your project's requirements
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
@@ -41,7 +28,7 @@ jobs:
       - name: Build project
         run: |
           cd vc14
-          msbuild otclient.sln /p:Configuration=Release
+          msbuild otclient.sln /p:Configuration=Release /p:Platform=x64
 
       - name: Upload executable as artifact
         uses: actions/upload-artifact@v4
