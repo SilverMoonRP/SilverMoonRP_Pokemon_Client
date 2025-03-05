@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
       - name: Checkout code
@@ -20,26 +20,28 @@ jobs:
         uses: MarkusJx/install-boost@v2
         id: install-boost
         with:
-          boost_version: '1.71.0'  # Ensure this version matches your project's requirements
+          boost_version: '1.71.0'  # Wybierz wersję Boost zgodną z Twoim projektem
 
-      - name: Set up MSVC environment
-        shell: cmd
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Update Windows SDK version
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+          $projectFile = 'vc14\otclient.vcxproj'
+          (Get-Content $projectFile) -replace '<WindowsTargetPlatformVersion>.*</WindowsTargetPlatformVersion>', '<WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>' | Set-Content $projectFile
 
       - name: Configure CMake
         run: |
-          mkdir build
-          cd build
-          cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT="${{ steps.install-boost.outputs.BOOST_ROOT }}" ..
+          cd vc14
+          cmake -G "Visual Studio 17 2022" -A x64 .. -DBOOST_ROOT=${{ steps.install-boost.outputs.BOOST_ROOT }}
 
       - name: Build project
         run: |
-          cd build
-          nmake
+          cd vc14
+          msbuild otclient.sln /p:Configuration=Release
 
       - name: Upload executable as artifact
         uses: actions/upload-artifact@v4
         with:
           name: SilverMoon.exe
-          path: build/Release/SilverMoon.exe
+          path: vc14/Release/SilverMoon.exe
