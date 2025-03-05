@@ -34,6 +34,9 @@ option(USE_PCH "Use precompiled header (speed up compile)" OFF)
 set(executable_SOURCES
     src/main.cpp
 )
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(WIN32)
     if(MSVC)

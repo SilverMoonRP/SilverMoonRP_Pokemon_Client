@@ -17,6 +17,9 @@ set(framework_LIBRARIES "")
 set(framework_DEFINITIONS "")
 set(framework_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/..")
 set(framework_SOURCES ${framework_SOURCES}
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
     ${CMAKE_CURRENT_LIST_DIR}/const.h
     ${CMAKE_CURRENT_LIST_DIR}/global.h
     ${CMAKE_CURRENT_LIST_DIR}/pch.h
