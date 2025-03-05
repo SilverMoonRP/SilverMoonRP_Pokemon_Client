@@ -1,3 +1,13 @@
+name: Build Tibia OTS Client
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build:
     runs-on: windows-2022
