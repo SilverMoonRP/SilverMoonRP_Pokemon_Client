@@ -18,24 +18,28 @@ jobs:
 
       - name: Install Boost
         uses: MarkusJx/install-boost@v2
+        id: install-boost
         with:
-          boost_version: '1.71.0'  # Wybierz wersję Boost zgodną z Twoim projektem
+          boost_version: '1.71.0'  # Ensure this version matches your project's requirements
 
-      - name: Setup MSVC Developer Command Prompt
-        uses: ilammy/msvc-dev-cmd@v1
+      - name: Set up MSVC environment
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
 
       - name: Configure CMake
         run: |
-          cd vc14
-          cmake -G "NMake Makefiles" -A x64 .. -DBOOST_ROOT=${{ env.BOOST_ROOT }}
+          mkdir build
+          cd build
+          cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT="${{ steps.install-boost.outputs.BOOST_ROOT }}" ..
 
       - name: Build project
         run: |
-          cd vc14
+          cd build
           nmake
 
       - name: Upload executable as artifact
         uses: actions/upload-artifact@v4
         with:
           name: SilverMoon.exe
-          path: vc14/Release/SilverMoon.exe
+          path: build/Release/SilverMoon.exe
