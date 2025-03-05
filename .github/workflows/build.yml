@@ -13,33 +13,40 @@ jobs:
     runs-on: windows-2022
 
     steps:
+      # Krok 1: Pobranie kodu z repozytorium
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Krok 2: Instalacja Boost
       - name: Install Boost
         uses: MarkusJx/install-boost@v2
         id: install-boost
         with:
-          boost_version: '1.76.0'  # Ensure this matches your project's requirements
+          boost_version: '1.76.0'  # Upewnij się, że wersja Boost jest zgodna z wymaganiami projektu
 
+      # Krok 3: Konfiguracja MSBuild
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
+      # Krok 4: Aktualizacja wersji Windows SDK
       - name: Update Windows SDK version
         run: |
           $projectFile = 'vc14\otclient.vcxproj'
           (Get-Content $projectFile) -replace '<WindowsTargetPlatformVersion>.*</WindowsTargetPlatformVersion>', '<WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>' | Set-Content $projectFile
 
+      # Krok 5: Konfiguracja CMake
       - name: Configure CMake
         run: |
           cd vc14
           cmake -G "Visual Studio 17 2022" -A x64 .. -DBOOST_ROOT=${{ steps.install-boost.outputs.BOOST_ROOT }} -DBOOST_LIBRARYDIR=${{ steps.install-boost.outputs.BOOST_ROOT }}/lib
 
+      # Krok 6: Budowanie projektu
       - name: Build project
         run: |
           cd vc14
           msbuild otclient.sln /p:Configuration=Release /p:Platform=x64
 
+      # Krok 7: Przesłanie pliku wykonywalnego jako artefakt
       - name: Upload executable as artifact
         uses: actions/upload-artifact@v4
         with:
